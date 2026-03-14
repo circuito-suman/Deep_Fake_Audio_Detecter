@@ -52,6 +52,18 @@ class ModelEvaluator:
             clf.fit(X_train, y_train)
             self.logger.info(f"{name} trained.")
 
+    def compute_eer(self, y_true, y_score):
+        """Computes the Equal Error Rate (EER)."""
+        fpr, tpr, thresholds = roc_curve(y_true, y_score, pos_label=1)
+        err = 0 
+        # fnr = 1 - tpr
+        # the EER is where fpr = fnr
+        # so we look for where fpr - (1 - tpr) crosses 0
+        fnr = 1 - tpr
+        eer_threshold = thresholds[np.nanargmin(np.absolute((fnr - fpr)))]
+        eer = fpr[np.nanargmin(np.absolute((fnr - fpr)))]
+        return eer, eer_threshold
+
     def evaluate_classifiers(self, X_test, y_test):
         for name, clf in self.classifiers.items():
             self.logger.info(f"Evaluating {name}...")
@@ -63,16 +75,22 @@ class ModelEvaluator:
             rec = recall_score(y_test, y_pred, zero_division=0)
             f1 = f1_score(y_test, y_pred, zero_division=0)
             
+            # Calculate EER
+            eer = 0.0
+            if y_prob is not None:
+                eer, _ = self.compute_eer(y_test, y_prob)
+
             self.results[name] = {
                 'accuracy': acc,
                 'precision': prec,
                 'recall': rec,
                 'f1': f1,
+                'eer': eer,
                 'y_prob': y_prob,
                 'clf': clf
             }
             
-            self.logger.info(f"{name} - Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1: {f1:.4f}")
+            self.logger.info(f"{name} - Accuracy: {acc:.4f}, EER: {eer:.4f}, F1: {f1:.4f}")
             print(f"\n{name} Classification Report:\n{classification_report(y_test, y_pred)}")
 
     def plot_confusion_matrices(self, X_test, y_test):

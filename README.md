@@ -1,80 +1,135 @@
 # Deepfake Audio Detection
 
-This project detects deepfake audio using multiple classifiers and feature extraction techniques.
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## Structure
+A robust, modular machine learning pipeline for detecting deepfake audio (AI-generated speech). This project leverages advanced feature extraction (MFCCs, Deltas, Statistical Moments) and ensemble classification to distinguish between real and synthetic audio.
 
-- `config.yaml`: Central configuration file for all parameters (models, data paths, features).
-- `AI_AGENT_GUIDE.md`: Comprehensive guide for AI agents to understand the project architecture.
-- `data/`: Raw and processed audio data.
-- `src/features/`: Feature extraction scripts (MFCC, Chroma, etc.).
-- `src/models/`: Classifier implementations (SVM, RF, MLP, etc.).
-- `src/utils/`: Helper utilities.
-- `plots/`: Generated plots (Confusion matrices, ROC curves).
-- `logs/`: Execution logs.
+**Compatible with Windows, macOS, and Linux.**
 
-## Setup
+## 🚀 Key Features
 
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+*   **Multi-Classifier Ensemble:** Utilizes SVM, Random Forest, Logistic Regression, KNN, and MLP for robust detection.
+*   **Advanced Feature Extraction:**
+    *   **MFCCs:** Mel-frequency cepstral coefficients.
+    *   **Temporal Dynamics:** Delta and Delta-Delta coefficients to capture speech motion.
+    *   **Statistical Analysis:** Mean, Variance, Skewness, and Kurtosis of features.
+*   **Biometric Metrics:** Calculates **Equal Error Rate (EER)**, the standard metric for spoofing detection.
+*   **Configuration Driven:** All parameters manageable via `config.yaml`.
+*   **Cross-Platform:** standardized path handling for all OS environments.
 
-2. Download data (Optional):
-   Populate `data/raw/real` and `data/raw/fake` with .wav files.
-   
-   **Recommended Datasets:**
-   - **ASVspoof 2019 (LA):** [Download Link](https://datashare.ed.ac.uk/handle/10283/3336) - A standard benchmark for logical access attacks (TTS/VC).
-   - **WaveFake:** [Download Link](https://zenodo.org/record/5642694) - Contains audio from multiple deepfake architectures (MelGAN, Parallel WaveGAN, etc.).
-   - **In-the-Wild:** [Download Link](https://deepfake-demo.aisec.fraunhofer.de/in_the_wild) - Real-world deepfake samples.
+## 📂 Project Structure
 
-   **Helper Script:**
-   You can use the helper script to try downloading or extracting these datasets:
-   ```bash
-   # List available datasets
-   python scripts/download_data.py --help
-
-   # Try to download specific dataset (may require manual download for large files)
-   python scripts/download_data.py --dataset asvspoof2019_la
-   ```
-
-   Or use the synthetic data generator for a demo.
-
-## Usage
-
-The project is configured via `config.yaml`. You can modify parameters there without changing the code.
-
-### Run with Synthetic Data (Demo)
-By default, the script generates synthetic features to demonstrate the pipeline without needing large datasets.
-
-```bash
-# Uses default mode from config.yaml (default: synthetic)
-python main.py 
+```
+Deep_Fake_Audio_Detecter/
+├── config.yaml           # Central configuration (Paramters, Paths, Models)
+├── main.py               # Main entry point for training/demo
+├── run.sh                # Helper script for Mac/Linux
+├── run.bat               # Helper script for Windows
+├── requirements.txt      # Python dependencies
+├── AI_AGENT_GUIDE.md     # Technical guide for AI assistance
+├── src/
+│   ├── features/         # Feature extraction logic (Librosa, Scipy)
+│   ├── models/           # Classifier definitions & Evaluation (EER, ROC)
+│   └── utils/            # Data loading & Synthetic generation
+├── data/                 # Data storage (git-ignored)
+│   ├── raw/              # Place .wav files here ({real, fake})
+│   └── processed/        # (Optional) Saved features
+├── plots/                # Generated Confusion Matrices & ROC Curves
+└── logs/                 # Execution logs
 ```
 
-### Run with Real Data
-Place your audio files in `data/raw/real` and `data/raw/fake`. Ensure `config.yaml` has `mode: "train"`, or override it via CLI:
+## 🛠️ Setup
 
-```bash
-python main.py --mode train
+### Prerequisites
+*   Python 3.8 or higher
+*   pip (Python Package Installer)
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd Deep_Fake_Audio_Detecter
+    ```
+
+2.  **Create a Virtual Environment (Recommended):**
+    *   **macOS/Linux:**
+        ```bash
+        python3 -m venv venv
+        source venv/bin/activate
+        ```
+    *   **Windows:**
+        ```cmd
+        python -m venv venv
+        venv\Scripts\activate
+        ```
+
+3.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## 📊 Data Preparation
+
+You have two options: **Synthetic Demo** (no download needed) or **Real Data Training**.
+
+### Option A: Synthetic Demo
+Run the project immediately without downloading gigabytes of audio. The system generates statistical features simulating real vs. fake distibutions.
+
+### Option B: Real Datasets
+Download one of the following and extract them into `data/raw/`:
+
+*   **ASVspoof 2019 (LA):** [Download](https://datashare.ed.ac.uk/handle/10283/3336) (Standard Benchmark)
+*   **WaveFake:** [Download](https://zenodo.org/record/5642694) (Modern Architectures)
+
+**Directory Structure for Real Data:**
+```
+data/
+  raw/
+    real/
+      file1.wav
+      file2.wav
+    fake/
+      deepfake1.wav
+      deepfake2.wav
 ```
 
-You can also specify a different config file:
-```bash
-python main.py --config my_custom_config.yaml
-```
+## 🏃 Usage
 
-## Classifiers
+### Quick Start (Demo)
 
-The system uses an ensemble of 5 classifiers:
-1. Support Vector Machine (SVM)
-2. Random Forest
-3. Logistic Regression
-4. k-Nearest Neighbors (KNN)
-5. Multi-Layer Perceptron (MLP)
+*   **macOS/Linux:**
+    ```bash
+    ./run.sh
+    ```
+*   **Windows:**
+    Double-click `run.bat` or run:
+    ```cmd
+    run.bat
+    ```
 
-## Results
+### Training on Real Data
 
-After running, check the `plots/` directory for:
-- Confusion Matrices for each classifier.
-- ROC Curves comparing performance.
+1.  Ensure your data is in `data/raw/real` and `data/raw/fake`.
+2.  Run the training pipeline:
+    ```bash
+    python main.py --mode train
+    ```
+3.  (Optional) Custom Configuration:
+    *   Edit **`config.yaml`** to change model hyperparameters, feature extraction settings (e.g., `n_mfcc`), or paths.
+
+## 📈 Results & Evaluation
+
+After execution, check the `plots/` directory for:
+1.  **Confusion Matrices:** Visual breakdown of True Positives, False Positives, etc.
+2.  **ROC Curves:** Performance trade-off between Sensitivity and Specificity.
+3.  **Console Output:** Classification Report (Precision, Recall, F1-Score) and **EER (Equal Error Rate)**.
+
+## 🤝 Contributing
+
+1.  Fork the repository
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
