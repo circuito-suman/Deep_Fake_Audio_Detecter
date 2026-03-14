@@ -7,14 +7,14 @@ from tqdm import tqdm
 import logging
 
 class DataLoader:
-    def __init__(self, data_dir, feature_extractor):
-        self.data_dir = data_dir
+    def __init__(self, config, feature_extractor):
+        self.data_dir = config['data']['raw_dir']
         self.feature_extractor = feature_extractor
         self.logger = logging.getLogger(__name__)
 
     def load_data(self):
         """
-        Loads data from data_dir. Assumes structure:
+        Loads data from data_dir defined in config. Assumes structure:
         data_dir/
             train/
                 real/
@@ -25,7 +25,15 @@ class DataLoader:
         X = []
         y = []
         
-        for split in ['train', 'test']:
+        # Check if train/test split folders exist, otherwise try flat structure
+        if os.path.exists(os.path.join(self.data_dir, 'train')):
+            splits = ['train', 'test']
+        else:
+            # If no train/test split folders, just load from root (e.g. data/raw/real, data/raw/fake)
+            # We will split later using train_test_split
+            splits = ['.']
+
+        for split in splits:
             split_dir = os.path.join(self.data_dir, split)
             if not os.path.exists(split_dir):
                 continue
@@ -46,11 +54,13 @@ class DataLoader:
         return np.array(X), np.array(y)
 
 class SyntheticDataGenerator:
-    def __init__(self, n_samples=1000, n_features=20):
-        self.n_samples = n_samples
-        self.n_features = n_features
+    def __init__(self, config):
+        self.n_samples = config['synthetic']['n_samples']
+        self.n_features = config['synthetic']['n_features']
+        self.random_seed = config.get('random_seed', 42)
 
     def generate_data(self):
+        np.random.seed(self.random_seed)
         # Generate synthetic features for demonstration
         # Real audio: Class 0 (Gaussian centered at 0)
         X_real = np.random.normal(loc=0.0, scale=1.0, size=(self.n_samples // 2, self.n_features))

@@ -4,6 +4,8 @@ This project detects deepfake audio using multiple classifiers and feature extra
 
 ## Structure
 
+- `config.yaml`: Central configuration file for all parameters (models, data paths, features).
+- `AI_AGENT_GUIDE.md`: Comprehensive guide for AI agents to understand the project architecture.
 - `data/`: Raw and processed audio data.
 - `src/features/`: Feature extraction scripts (MFCC, Chroma, etc.).
 - `src/models/`: Classifier implementations (SVM, RF, MLP, etc.).
@@ -40,18 +42,26 @@ This project detects deepfake audio using multiple classifiers and feature extra
 
 ## Usage
 
+The project is configured via `config.yaml`. You can modify parameters there without changing the code.
+
 ### Run with Synthetic Data (Demo)
 By default, the script generates synthetic features to demonstrate the pipeline without needing large datasets.
 
 ```bash
-python main.py --mode synthetic
+# Uses default mode from config.yaml (default: synthetic)
+python main.py 
 ```
 
 ### Run with Real Data
-Place your audio files in `data/raw/real` and `data/raw/fake`.
+Place your audio files in `data/raw/real` and `data/raw/fake`. Ensure `config.yaml` has `mode: "train"`, or override it via CLI:
 
 ```bash
-python main.py --mode train --data_dir data/raw
+python main.py --mode train
+```
+
+You can also specify a different config file:
+```bash
+python main.py --config my_custom_config.yaml
 ```
 
 ## Classifiers

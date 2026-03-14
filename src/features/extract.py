@@ -3,9 +3,9 @@ import numpy as np
 import logging
 
 class FeatureExtractor:
-    def __init__(self, sample_rate=22050, n_mfcc=40):
-        self.sample_rate = sample_rate
-        self.n_mfcc = n_mfcc
+    def __init__(self, config):
+        self.sample_rate = config['features']['sample_rate']
+        self.n_mfcc = config['features']['n_mfcc']
         self.logger = logging.getLogger(__name__)
 
     def extract_features(self, file_path):

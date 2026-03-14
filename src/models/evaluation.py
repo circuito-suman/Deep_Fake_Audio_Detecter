@@ -11,18 +11,38 @@ import logging
 import os
 
 class ModelEvaluator:
-    def __init__(self, output_dir='plots'):
-        self.output_dir = output_dir
+    def __init__(self, config):
+        self.config = config
+        self.output_dir = config['outputs']['plots_dir']
         os.makedirs(self.output_dir, exist_ok=True)
         self.logger = logging.getLogger(__name__)
         
-        # Initialize classifiers
+        # Initialize classifiers with config parameters
+        models_cfg = self.config['models']
+        
         self.classifiers = {
-            'SVM': SVC(kernel='rbf', probability=True),
-            'Random Forest': RandomForestClassifier(n_estimators=100),
-            'Logistic Regression': LogisticRegression(max_iter=1000),
-            'KNN': KNeighborsClassifier(n_neighbors=5),
-            'MLP': MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500, alpha=0.0001)
+            'SVM': SVC(
+                kernel=models_cfg['svm']['kernel'], 
+                probability=models_cfg['svm']['probability'],
+                random_state=self.config['random_seed']
+            ),
+            'Random Forest': RandomForestClassifier(
+                n_estimators=models_cfg['random_forest']['n_estimators'],
+                random_state=models_cfg['random_forest']['random_state']
+            ),
+            'Logistic Regression': LogisticRegression(
+                max_iter=models_cfg['logistic_regression']['max_iter'],
+                random_state=models_cfg['logistic_regression']['random_state']
+            ),
+            'KNN': KNeighborsClassifier(
+                n_neighbors=models_cfg['knn']['n_neighbors']
+            ),
+            'MLP': MLPClassifier(
+                hidden_layer_sizes=tuple(models_cfg['mlp']['hidden_layer_sizes']), 
+                max_iter=models_cfg['mlp']['max_iter'], 
+                alpha=models_cfg['mlp']['alpha'],
+                random_state=models_cfg['mlp']['random_state']
+            )
         }
         self.results = {}
 

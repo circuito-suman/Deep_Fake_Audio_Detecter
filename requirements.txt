@@ -7,3 +7,4 @@ seaborn
 tqdm
 requests
 soundfile
+pyyaml
