@@ -75,6 +75,10 @@ def main():
     # Evaluate
     evaluator.evaluate_classifiers(X_test, y_test)
     
+    # Save Models
+    logger.info("Saving trained models...")
+    evaluator.save_models()
+    
     # Plot results
     logger.info("Plotting results...")
     evaluator.plot_confusion_matrices(X_test, y_test)

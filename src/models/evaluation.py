@@ -14,6 +14,7 @@ import seaborn as sns
 import numpy as np
 import logging
 import os
+import joblib
 
 class ModelEvaluator:
     def __init__(self, config):
@@ -138,3 +139,14 @@ class ModelEvaluator:
         plt.legend(loc="lower right")
         plt.savefig(os.path.join(self.output_dir, 'roc_curves.png'))
         plt.close()
+
+    def save_models(self):
+        """Saves all trained models to disk."""
+        save_dir = self.config['outputs']['model_save_dir']
+        os.makedirs(save_dir, exist_ok=True)
+        
+        for name, clf in self.classifiers.items():
+            filename = f"{name.lower().replace(' ', '_')}.pkl"
+            filepath = os.path.join(save_dir, filename)
+            joblib.dump(clf, filepath)
+            self.logger.info(f"Saved {name} model to {filepath}")
