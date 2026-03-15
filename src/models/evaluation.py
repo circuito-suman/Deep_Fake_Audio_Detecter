@@ -9,6 +9,8 @@ try:
 except ImportError:
     HAS_XGBOOST = False
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, classification_report
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -36,18 +38,24 @@ class ModelEvaluator:
                 n_estimators=models_cfg['random_forest']['n_estimators'],
                 random_state=models_cfg['random_forest']['random_state']
             ),
-            'Logistic Regression': LogisticRegression(
-                max_iter=models_cfg['logistic_regression']['max_iter'],
-                random_state=models_cfg['logistic_regression']['random_state']
+            'Logistic Regression': make_pipeline(
+                StandardScaler(),
+                LogisticRegression(
+                    max_iter=models_cfg['logistic_regression']['max_iter'],
+                    random_state=models_cfg['logistic_regression']['random_state']
+                )
             ),
             'KNN': KNeighborsClassifier(
                 n_neighbors=models_cfg['knn']['n_neighbors']
             ),
-            'MLP': MLPClassifier(
-                hidden_layer_sizes=tuple(models_cfg['mlp']['hidden_layer_sizes']), 
-                max_iter=models_cfg['mlp']['max_iter'], 
-                alpha=models_cfg['mlp']['alpha'],
-                random_state=models_cfg['mlp']['random_state']
+            'MLP': make_pipeline(
+                StandardScaler(), 
+                MLPClassifier(
+                    hidden_layer_sizes=tuple(models_cfg['mlp']['hidden_layer_sizes']), 
+                    max_iter=models_cfg['mlp']['max_iter'], 
+                    alpha=models_cfg['mlp']['alpha'],
+                    random_state=models_cfg['mlp']['random_state']
+                )
             )
         }
         
