@@ -40,16 +40,29 @@ class DataLoader:
                 
             for label, class_name in enumerate(['real', 'fake']):
                 class_dir = os.path.join(split_dir, class_name)
-                if not os.path.exists(class_dir):
+                
+                # Debug logging
+                if os.path.exists(class_dir):
+                    self.logger.info(f"Scanning directory: {class_dir}")
+                else:
+                    self.logger.warning(f"Directory not found: {class_dir}")
                     continue
+                
+                # Recursively find all audio files
+                file_paths = []
+                audio_extensions = ('.wav', '.mp3', '.flac', '.ogg')
+                for root, dirs, files in os.walk(class_dir):
+                    for file in files:
+                        if file.lower().endswith(audio_extensions):
+                            file_paths.append(os.path.join(root, file))
+                            
+                self.logger.info(f"Found {len(file_paths)} audio files in {class_name}")
                     
-                for file_name in tqdm(os.listdir(class_dir), desc=f"Loading {split}/{class_name}"):
-                    if file_name.endswith('.wav'):
-                        file_path = os.path.join(class_dir, file_name)
-                        features = self.feature_extractor.extract_features(file_path)
-                        if features is not None:
-                            X.append(features)
-                            y.append(label)
+                for file_path in tqdm(file_paths, desc=f"Loading {split}/{class_name}"):
+                    features = self.feature_extractor.extract_features(file_path)
+                    if features is not None:
+                        X.append(features)
+                        y.append(label)
                             
         return np.array(X), np.array(y)
 

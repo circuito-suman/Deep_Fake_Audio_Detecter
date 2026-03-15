@@ -8,4 +8,3 @@ tqdm
 requests
 soundfile
 pyyaml
-scipy

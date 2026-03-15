@@ -11,25 +11,25 @@ This project is a modular machine learning pipeline for detecting deepfake audio
 ### `config.yaml` Structure
 - **General:** Mode (train/synthetic), random seeds.
 - **Data:** Paths for raw/processed data and split ratios.
-- **Features:** DSP parameters (sample rate, MFCC, Delta/Delta-Delta, Stat Moments).
+- **Features:** DSP parameters (sample rate, MFCC coefficients).
 - **Models:** Hyperparameters for the individual classifiers.
 - **Outputs:** Directories for plots and logs.
 
 ## Codebase Structure
 - `main.py`: Entry point. Loads config, orchestrates data loading, feature extraction, training, and evaluation.
-- `src/features/extract.py`: `FeatureExtractor` class. Uses `librosa`, `scipy`. Calculates Temporal Statistics (Mean, Std, Skew, Kurtosis) of MFCCs + Deltas. **Dependency:** `config['features']`.
-- `src/models/evaluation.py`: `ModelEvaluator` class. Wraps sklearn models. **Calculates EER (Equal Error Rate).** **Dependency:** `config['models']`.
+- `src/features/extract.py`: `FeatureExtractor` class. Uses `librosa`. **Dependency:** `config['features']`.
+- `src/models/evaluation.py`: `ModelEvaluator` class. Wraps sklearn models. **Dependency:** `config['models']`.
 - `src/utils/data_processing.py`: `DataLoader` and `SyntheticDataGenerator`. **Dependency:** `config['data']`, `config['synthetic']`.
 
 ## Workflow for AI Agents
 1. **Check `config.yaml`** for current settings before running.
 2. **Data Ingestion:** verify `data/raw/real` and `data/raw/fake` exist if running in `train` mode.
-3. **Run Pipeline:** Execute `python main.py` (or `run.bat` on Windows).
-4. **Analysis:** Check `plots/` for generated confusion matrices and ROC curves. Verify `logs/` for EER metrics.
+3. **Run Pipeline:** Execute `python main.py`.
+4. **Analysis:** Check `plots/` for generated confusion matrices and ROC curves.
 
 ## Dependencies
-- `numpy`, `pandas`, `scipy`, `scikit-learn` for ML/Stats.
-- `librosa`, `soundfile` for audio processing.
+- `numpy`, `pandas`, `scikit-learn` for ML.
+- `librosa` for audio processing.
 - `matplotlib`, `seaborn` for plotting.
 - `pyyaml` for configuration management.
 
