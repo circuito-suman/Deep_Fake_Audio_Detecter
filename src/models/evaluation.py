@@ -3,6 +3,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+try:
+    from xgboost import XGBClassifier
+    HAS_XGBOOST = True
+except ImportError:
+    HAS_XGBOOST = False
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -44,6 +49,31 @@ class ModelEvaluator:
                 random_state=models_cfg['mlp']['random_state']
             )
         }
+        
+        # Add XGBoost if available and configured
+        if HAS_XGBOOST and 'xgboost' in models_cfg:
+            xgb_cfg = models_cfg['xgboost']
+            try:
+                self.classifiers['XGBoost'] = XGBClassifier(
+                    n_estimators=xgb_cfg['n_estimators'],
+                    learning_rate=xgb_cfg['learning_rate'],
+                    max_depth=xgb_cfg['max_depth'],
+                    subsample=xgb_cfg['subsample'],
+                    colsample_bytree=xgb_cfg['colsample_bytree'],
+                    objective=xgb_cfg['objective'],
+                    tree_method=xgb_cfg['tree_method'],
+                    device=xgb_cfg['device'],
+                    random_state=self.config['random_seed']
+                )
+                self.logger.info("XGBoost initialized with GPU support.")
+            except Exception as e:
+                self.logger.warning(f"Could not initialize XGBoost with GPU: {e}. Falling back to CPU or skipping.")
+                # Fallback to CPU if GPU fails (e.g. no drivers)
+                self.classifiers['XGBoost'] = XGBClassifier(
+                    n_estimators=xgb_cfg['n_estimators'],
+                    random_state=self.config['random_seed']
+                )
+
         self.results = {}
 
     def train_classifiers(self, X_train, y_train):

@@ -4,6 +4,7 @@ import pandas as pd
 from src.features.extract import FeatureExtractor
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+from joblib import Parallel, delayed
 import logging
 
 class DataLoader:
@@ -57,9 +58,15 @@ class DataLoader:
                             file_paths.append(os.path.join(root, file))
                             
                 self.logger.info(f"Found {len(file_paths)} audio files in {class_name}")
-                    
-                for file_path in tqdm(file_paths, desc=f"Loading {split}/{class_name}"):
-                    features = self.feature_extractor.extract_features(file_path)
+                
+                # Parallel feature extraction
+                # Use n_jobs=-1 to use all CPU cores
+                results = Parallel(n_jobs=-1)(
+                    delayed(self.feature_extractor.extract_features)(fp) 
+                    for fp in tqdm(file_paths, desc=f"Loading {split}/{class_name}")
+                )
+                
+                for features in results:
                     if features is not None:
                         X.append(features)
                         y.append(label)

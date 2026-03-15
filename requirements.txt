@@ -8,3 +8,7 @@ tqdm
 requests
 soundfile
 pyyaml
+xgboost
+joblib
+torch
+torchaudio
