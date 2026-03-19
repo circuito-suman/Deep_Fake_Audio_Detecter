@@ -12,6 +12,8 @@ This project detects deepfake audio using multiple classifiers and feature extra
 - `src/utils/`: Helper utilities.
 - `plots/`: Generated plots (Confusion matrices, ROC curves).
 - `logs/`: Execution logs.
+- `examples/`: contains example audio files for testing.
+
 
 ## Setup
 
